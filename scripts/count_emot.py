@@ -11,29 +11,27 @@ import sys
 from collections import Counter
 import csv
 
-def main(dictionaries_dir="/Users/sophie_chou/Google Drive/Speech Analyses/speech-analysis/data/dictionaries/", \
-            speeches_dir='/Users/sophie_chou/Google Drive/Speech Analyses/speech-analysis/data/tokenized/SOTU/',\
-            results_dir="/Users/sophie_chou/Google Drive/Speech Analyses/speech-analysis/results/SOTU/"): 
+def main(path_to_dictionaries, path_to_tokens, path_to_results):
 
-    dictionaries = glob.glob(dictionaries_dir + '*')
-    speeches = glob.glob(speeches_dir + '*') 
+    dictionaries = glob.glob(path_to_dictionaries + '*')
+    speeches = glob.glob(path_to_tokens + '*') 
  
     categories = []
     for d in dictionaries:
         with open(d) as f:
             categories.append((basename(d).replace('.csv', ''), f.read().split()))
 
-    print results_dir
-    outpath =  results_dir + 'emotional-vocab-count.csv'
+    print path_to_results
+    outpath =  path_to_results + 'emotional-vocab-count.csv'
 
     print outpath
     with open(outpath, "wb") as outfile: 
         writer = csv.writer(outfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL) 
-        writer.writerow(['president', 'year', 'category', 'count', 'total_words', 'percent'])
+        #writer.writerow(['president', 'year', 'category', 'count', 'total_words', 'percent'])
+        writer.writerow(['speech', 'category', 'count', 'total_words', 'percent'])
 
         for s in speeches:
-            president, year = basename(s).replace("-tokens.txt", "").split("-")
-            print president, year
+            speechname = basename(s).replace("-tokens.txt", "")  
 
             with open(s) as f:
                 tokens = f.read().upper().split() 
@@ -43,7 +41,7 @@ def main(dictionaries_dir="/Users/sophie_chou/Google Drive/Speech Analyses/speec
                     total = len({key: c[key] for key in c if key in category[1]}.values())
                     wc = len(tokens)
                     percent = 100 * (total / (wc * 1.0))
-                    writer.writerow([president, year, category[0], total, wc, round(percent,2)])
+                    writer.writerow([speechname, category[0], total, wc, round(percent,2)])
  
     # still easier than sorting in excel
     df = pandas.read_csv(outpath)
@@ -52,6 +50,9 @@ def main(dictionaries_dir="/Users/sophie_chou/Google Drive/Speech Analyses/speec
 
 
 if __name__ == "__main__":
-   main()
+   main(sys.argv[1], sys.argv[2], sys.argv[3])
+   # example: 
+   # python count_emot.py ../data/dictionaries/ ../data/tokenized/SOTU/ ../results/SOTU/
+   # python count_emot.py ../data/dictionaries/ ../data/tokenized/trump-speeches/ ../results/trump-speeches/
 
 

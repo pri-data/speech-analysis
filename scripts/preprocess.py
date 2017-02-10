@@ -8,7 +8,8 @@ from os.path import basename
 # Make your word tokenizer. We don't care about punct.
 import nltk
 from nltk.tokenize import RegexpTokenizer
-tokenizer = RegexpTokenizer(r'\w+') 
+# we want to keep contractions! unlike usual tokenization.
+tokenizer = RegexpTokenizer(r'[\w\']+') 
 
 def main(input_dir='../data/SOTU/', output_dir='../data/tokenized/SOTU/'): 
     """
